@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="menu">
+        <item>选择壁纸</item>
+        <item>刷新桌面</item>
+        <item>系统设置</item>
+        <item>取消</item>
+
+    </string-array>
+</resources>

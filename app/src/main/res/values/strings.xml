@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">The Launcher</string>
+    <item name="pkgName" type="id" />
+    <item name="isShortcut" type="id" />
+    <item name="wallppChange" type="id"/>
+    <item name="sysSetting" type="id"/>
+    <string name="barText">★#ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+    <string name="fav_file">favoriteApps</string>
+    <string name="appOp1">添加到常用</string>
+    <string name="appOp2">查看app详情</string>
+    <string name="appOp3">卸载</string>
+    <string name="menuOp1">打开系统设置</string>
+    <string name="menuOp2">选择壁纸</string>
+    <string name="menuOp3">重新加载桌面</string>
+    <string name="scOp1">从常用移除</string>
+    <string name="scOp2">查看app详情</string>
+    <string name="scOp3">卸载</string>
+
+</resources>
