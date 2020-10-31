@@ -1,2 +1,2 @@
 # new-launcher
-toby's laucher from myLauncher
+toby's laucher from myLauncher with new design :)
