@@ -23,7 +23,10 @@ import android.view.animation.AnimationUtils;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
+
 import androidx.annotation.Nullable;
+
 
 public class MyDragbarView  extends androidx.appcompat.widget.AppCompatImageView{
     public AllController ctr;
@@ -52,10 +55,10 @@ public class MyDragbarView  extends androidx.appcompat.widget.AppCompatImageView
     public MyDragbarView(Context context){
         this(context,null);
     }
-    public MyDragbarView(Context context,@Nullable AttributeSet atts){
+    public MyDragbarView(Context context, AttributeSet atts){
         this(context,atts,0);
     }
-    public MyDragbarView(Context context,@Nullable AttributeSet atts, int defStyleAttr){
+    public MyDragbarView(Context context,AttributeSet atts, int defStyleAttr){
         super(context,atts,defStyleAttr);
         theHd = new Handler();
         theTm = new Timer();

@@ -123,7 +123,7 @@ public class MainActivity extends Activity {
     private class BatteryReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context,Intent intent){
-            int current= Objects.requireNonNull(intent.getExtras()).getInt("level");
+            int current= intent.getExtras().getInt("level");
             int total=intent.getExtras().getInt("scale");
             float ratio=1.0f*current/total;
             btry.setGuidelinePercent(ratio);
