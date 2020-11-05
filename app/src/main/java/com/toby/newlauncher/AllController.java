@@ -504,6 +504,12 @@ public class AllController {
 
     }
 
+    public void scrollToTop(){
+        md.curGl=-1;
+        md.lastGl=-1;
+        scrollTable(0,0f);
+    }
+
     public void scrollTable(int index,float y){
         View selected=appTable.getChildAt(index);
         if(selected==null)return ;

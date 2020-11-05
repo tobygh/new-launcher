@@ -36,7 +36,7 @@ public class MyDragbarView  extends androidx.appcompat.widget.AppCompatImageView
     Timer theTm;
     TimerTask tTask;
     String barText=getResources().getString(R.string.barText);
-    int curGl,lastGl;
+    public int curGl,lastGl;
     final int barW=100;
     //PathMeasure pathMeasure=new PathMeasure();
     Path bezierPath;
@@ -163,7 +163,7 @@ public class MyDragbarView  extends androidx.appcompat.widget.AppCompatImageView
         else if (curGl<0)curGl=0;
         //if(curGl!=lastGl){
         invalidate();
-        Log.i("debug","selected "+curGl);
+        Log.i("debug","selected "+curGl+','+lastGl);
         //}
         if(curGl!=lastGl)
         ctr.scrollTable(curGl,(curGl+0.5f)*blockH);

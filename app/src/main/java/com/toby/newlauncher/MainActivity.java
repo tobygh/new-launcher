@@ -151,7 +151,9 @@ public class MainActivity extends Activity {
     private class HomeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent){
-            ctr.scrollTable(0,0f);
+            ctr.scrollToTop();
+            //ctr.scrollTable(0,0f);
+
         }
     }
     ApkReceiver ar;
@@ -310,7 +312,8 @@ public class MainActivity extends Activity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event){
         if (keyCode==KeyEvent.KEYCODE_BACK){
-            scr.smoothScrollTo(0,0);
+            //scr.smoothScrollTo(0,0);
+            ctr.scrollToTop();
             Log.d("key","return");
             return true;
         }
