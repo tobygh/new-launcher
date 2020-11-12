@@ -32,13 +32,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Timer;
 import android.os.Handler;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.TimerTask;
 import java.util.TreeSet;
 
 public class AllController {
@@ -119,6 +122,7 @@ public class AllController {
             int index=pkg2Idx.get(pkgName);
 
             MyAppHolder holder=allApps.get(index);
+            String label=holder.label;
             //assert holder != null;
             String cat=""+holder.cat;
             //allApps.remove(index);
@@ -137,7 +141,7 @@ public class AllController {
             commitChange(bartext.indexOf(cat));
             if(index==scIndex)
                 scIndex-=1;
-            Toast.makeText(main, "卸载成功",Toast.LENGTH_SHORT).show();
+            Toast.makeText(main, "卸载"+label+"成功",Toast.LENGTH_SHORT).show();
 
         }
         public String addShortcut(String pkgName){
@@ -246,7 +250,7 @@ public class AllController {
     String bartext;//"★#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     String fav_file;//favoriteApps
     //boolean updating=false;
-
+    Set<String> pkg2del;
     final int nCol=5;
     Handler theHd;
     Timer theTm;
@@ -256,7 +260,7 @@ public class AllController {
 
     AllController(){
         appdatabase=new appdatabase();
-
+        pkg2del=new HashSet<>();
         theHd=new Handler();
         theTm=new Timer();
 
@@ -334,7 +338,7 @@ public class AllController {
                 inflater ==null||
                 main==null||
                 bartext==null
-                )
+        )
             throw new java.lang.IllegalArgumentException();
         appdatabase.init();
         loadApps();
@@ -342,7 +346,7 @@ public class AllController {
     }
     public void loadApps() {
         fav_file=ctx.getString(R.string.fav_file);
-        
+
         LinearLayout.LayoutParams lllp= new LinearLayout.LayoutParams(-1,-2);
         lllp.bottomMargin=10;
         //init app containers/database
@@ -388,12 +392,12 @@ public class AllController {
         //String[] pkgs=spGet();
         //for (String pkgName : pkgs) {
         //    appdatabase.addShortcut(pkgName);
-            //if(pkg2Idx.containsKey(pkgName)){
-            //    Log.d("debug","allapps"+allApps.size());
-            //    String rank = allApps.get(pkg2Idx.get(pkgName)).rank;
-            //    appCategory.get(bartext.substring(0, 1)).add(Pair.create(rank, pkgName));
-            //    pkgHasSc.put(pkgName, true);
-            //}
+        //if(pkg2Idx.containsKey(pkgName)){
+        //    Log.d("debug","allapps"+allApps.size());
+        //    String rank = allApps.get(pkg2Idx.get(pkgName)).rank;
+        //    appCategory.get(bartext.substring(0, 1)).add(Pair.create(rank, pkgName));
+        //    pkgHasSc.put(pkgName, true);
+        //}
         //}
 
         //generate all views
@@ -440,67 +444,47 @@ public class AllController {
         }
     }
     public void handleAdd(String pkg)   {
-        //reLoadApps();
-        pkg=pkg.substring(8);
+        if(pkg2del.contains(pkg)){
+            pkg2del.remove(pkg);
+            if(pkg2del.isEmpty())
+                theTm.cancel();
+            return;
+        }
         ApplicationInfo appInfo=null;
         try{appInfo=pm.getApplicationInfo(pkg,0);}
         catch (PackageManager.NameNotFoundException e){e.printStackTrace();}
         if(appInfo==null)return;
         MyAppHolder holder=new MyAppHolder(nApps,""+appInfo.loadLabel(pm),appInfo.packageName,appInfo.loadIcon(pm));
-        /*allApps.add(holder);
-        pkg2Idx.put(holder.pkgName,nApps);
-        String idx=holder.rank.substring(0,1);
-        if(!bartext.contains(idx))
-            idx="#";
-        //Log.d("num",Integer.getInteger(idx)+","+idx);
-        appCategory.get(idx).add(Pair.create(holder.rank,holder.pkgName));
-        nApps+=1;
-        //ms.needUpdate=true;
-        //refillGridview(bartext.indexOf(idx));*/
         boolean res=appdatabase.addApp(holder);
-        //commitChange(bartext.indexOf(holder.cat));
         if(res)Toast.makeText(main, "新安装了"+holder.label,Toast.LENGTH_SHORT).show();
-
-
+    }
+    public void surelyDel(String pkg){
+        nextDelForSure=false;
+        appdatabase.delApp(pkg);
     }
     public void handleDel(String pkg) {
-        pkg = pkg.substring(8);
-        //reLoadApps();
-        /*
-        String pkgName=pkg.substring(8);
-        if(!pkg2Idx.containsKey(pkgName))
-            return;
-        //Caused by: java.lang.IndexOutOfBoundsException: Index: 92, Size: 92
-        int idx=pkg2Idx.get(pkgName);
-
-        MyAppHolder holder=allApps.get(idx);
-        String sIdx=holder.rank.substring(0,1);
-
-        if(!bartext.contains(sIdx))
-            sIdx="#";
-        // Caused by: java.lang.NullPointerException: Attempt to invoke virtual method 'boolean java.util.TreeSet.remove(java.lang.Object)' on a null object reference
-        //Log.d("num",Integer.getInteger(sIdx)+","+sIdx);
-        appCategory.get(sIdx).remove(Pair.create(holder.rank,holder.pkgName));
-        allApps.remove(idx);
-        pkg2Idx.remove(pkg);
-        //refillGridview(bartext.indexOf(sIdx));
-        putChange(bartext.indexOf(sIdx));
-        if(pkgHasSc.containsKey(pkgName)&&pkgHasSc.get(pkgName))
-        {
-            pkgHasSc.put(pkgName,false);
-            String rank=holder.rank;
-            appCategory.get(bartext.substring(0,1)).remove(Pair.create(rank,pkgName));
-            spDel(pkgName);
-            //refillGridview(0);
-            putChange(bartext.indexOf(0));
-
-        }*/
-        appdatabase.delApp(pkg);
-
+        pkg2del.add(pkg);
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                theHd.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        for(String pkg:pkg2del)
+                            appdatabase.delApp(pkg);
+                        pkg2del.clear();
+                    }
+                });
+            }
+        };
+        theTm = new Timer();
+        theTm.schedule(task,500);
     }
     public void handleRep(String pkg) {
-            //pkg = pkg.substring(8);
-        Toast.makeText(main, "更新成功",Toast.LENGTH_SHORT).show();
+        //pkg = pkg.substring(8);
+        int id=appdatabase.pkg2Idx.get(pkg);
+        MyAppHolder holder=appdatabase.allApps.get(id);
+        Toast.makeText(main, "更新"+holder.label+"成功",Toast.LENGTH_SHORT).show();
 
     }
 
@@ -538,44 +522,11 @@ public class AllController {
     }
 
     public void addShortCut(String pkgName) {
-
-        /*if(!pkg2Idx.containsKey(pkgName))
-            return;
-        MyAppHolder holder=allApps.get(pkg2Idx.get(pkgName));
-        if (pkgHasSc.containsKey(pkgName)&&pkgHasSc.get(pkgName)){
-            Toast.makeText(main, holder.label+"已经在常用中！",Toast.LENGTH_SHORT).show();
-            return;
-        }
-        pkgHasSc.put(pkgName,true);
-
-        String rank=holder.rank;
-        appCategory.get(bartext.substring(0,1)).add(Pair.create(rank,pkgName));
-        spAdd(pkgName);
-        //refillGridview(0);
-        putChange(0);
-        */
         String label=appdatabase.addShortcut(pkgName);
-        //commitChange(0);
         Toast.makeText(main, "已将"+label+"添加至常用",Toast.LENGTH_SHORT).show();
     }
     public void deleteShortCut(String pkgName) {
-        /*if(!pkg2Idx.containsKey(pkgName))
-            return;
-        MyAppHolder holder=allApps.get(pkg2Idx.get(pkgName));
-        if (pkgHasSc.containsKey(pkgName)){
-            if(pkgHasSc.get(pkgName)){
-                pkgHasSc.put(pkgName,false);
-                String rank=holder.rank;
-                appCategory.get(bartext.substring(0,1)).remove(Pair.create(rank,pkgName));
-                spDel(pkgName);
-                //refillGridview(0);
-                putChange(0);
-                Toast.makeText(main, "已将"+holder.label+"从常用移除",Toast.LENGTH_SHORT).show();
-
-            }
-        }*/
         String label=appdatabase.delShortcut(pkgName);
-
         Toast.makeText(main, "已将"+label+"从常用移除",Toast.LENGTH_SHORT).show();
     }
     public void deleteApp(String pkgName){

@@ -53,7 +53,7 @@ public class MainActivity extends Activity {
     MyDragbarView drView;
     Guideline btry;
     TextView tm;
-    Set<String> pkg2del;
+    //Set<String> pkg2del;
     MyScrollView scr;
     LinearLayout table;
     Calendar cal;
@@ -76,25 +76,29 @@ public class MainActivity extends Activity {
             //Log.i("debug",intent.getAction()+intent.getData().getSchemeSpecificPart());
             //if (intent.getPackage()==getPackageName()) return ;
             String action=intent.getAction();
+            String pkg = intent.getDataString().substring(8);
             //String pkg=intent.getDataString();
             Log.d("apk","apk"+action);
             assert action != null;
             switch (action) {
                 case Intent.ACTION_PACKAGE_ADDED:
-                    String pkg = intent.getDataString();
-                    if (pkg2del.contains(pkg)) {
+
+                    /*if (pkg2del.contains(pkg)) {
                         pkg2del.remove(pkg);
                         if (pkg2del.isEmpty())
                             theTm.cancel();
-                    } else ctr.handleAdd(intent.getDataString());
+                    } else
+                        */
+                    ctr.handleAdd(pkg);
                     break;
                 case Intent.ACTION_PACKAGE_REMOVED:
                     if (ctr.nextDelForSure) {
-                        ctr.handleDel(intent.getDataString());
-                        ctr.nextDelForSure = false;
+                        //ctr.handleDel(intent.getDataString());
+                        ctr.surelyDel(pkg);
+                        //ctr.nextDelForSure = false;
                     } else {
                         //not so sure whether it's del or update
-                        pkg2del.add(intent.getDataString());
+                        /*pkg2del.add(intent.getDataString());
                         TimerTask task = new TimerTask() {
                             @Override
                             public void run() {
@@ -110,11 +114,16 @@ public class MainActivity extends Activity {
                         };
                         theTm = new Timer();
                         theTm.schedule(task, 1000);
+                    */
+                        ctr.handleDel(pkg);
                     }
+                    //for (String pkgd : pkg2del)
+
+                    //pkg2del.clear();
                     //ctr.handleDel(intent.getDataString());
                     break;
                 case Intent.ACTION_PACKAGE_REPLACED:
-                    ctr.handleRep(intent.getDataString());
+                    ctr.handleRep(pkg);
                     break;
             }
 
@@ -195,7 +204,7 @@ public class MainActivity extends Activity {
         fav_file=getString(R.string.fav_file);
         theHd=new Handler();
         //theTm=new Timer();
-        pkg2del=new HashSet<>();
+        //pkg2del=new HashSet<>();
         drView=findViewById(R.id.dragBar);
         table=findViewById(R.id.iconTable);
         bg=findViewById(R.id.background);
